@@ -17,7 +17,7 @@ pipeline {
                 // sh 'rm -rf /home/jenkins/web'
                 
                 //Create the directory
-                sh 'mkdir /home/cloud_user/web'  
+                sh 'sudo mkdir /home/cloud_user/web'  
             }
         }
         /* stage('Drop the Apache HTTPD Docker container'){
