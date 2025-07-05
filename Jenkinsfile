@@ -20,12 +20,12 @@ pipeline {
                 sh 'mkdir web'  
             }
         }
-        /* stage('Drop the Apache HTTPD Docker container'){
+         stage('Drop the Apache HTTPD Docker container'){
             steps {
             echo 'droping the container...'
             sh 'docker rm -f apache1'
             }
-        } */
+        } 
         
         stage('Create the Apache httpd container') {
             steps {
@@ -36,7 +36,7 @@ pipeline {
         stage('Copy the web application to the container directory') {
             steps {
                 echo 'Copying web application...'             
-                sh 'cp -r web/* web'
+                sh 'cp -r web/* /web'
             }
         }
         stage('Checking the app') {
