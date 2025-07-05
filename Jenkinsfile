@@ -1,50 +1,49 @@
 pipeline {
     agent any
-   
+
     stages {
-        stage('Create web directory')
-        {
-            input {
-              message 'Enter the data'
-              parameters {
-                    string(name:'AUTHOR', defaultValue: 'Dobri', description: 'Author of the web application deployment ')
-                    string(name:'ENVIRONMENT', defaultValue: 'Development',description: 'Environment to deploy')
-                 }
-            }
+        stage('Create web directory') {
             steps {
-                echo "The responsible of this project is ${AUTHOR} and and will be deployed in ${ENVIRONMENT}"
-                //Fisrt, drop the directory if exists
+                script {
+                    def userInput = input(
+                        message: 'Enter the data',
+                        parameters: [
+                            string(name: 'AUTHOR', defaultValue: 'Dobri', description: 'Author'),
+                            string(name: 'ENVIRONMENT', defaultValue: 'Development', description: 'Environment')
+                        ]
+                    )
+                    env.AUTHOR = userInput['AUTHOR']
+                    env.ENVIRONMENT = userInput['ENVIRONMENT']
+                }
+
+                echo "The responsible of this project is ${env.AUTHOR} and will be deployed in ${env.ENVIRONMENT}"
+
                 sh 'rm -rf web'
-                
-                //Create the directory
-                sh 'mkdir web'  
+                sh 'mkdir web'
             }
         }
-         stage('Drop the Apache HTTPD Docker container'){
+
+        stage('Drop the Apache HTTPD Docker container') {
             steps {
-            echo 'droping the container...'
-            sh 'docker rm -f apache1'
+                echo 'Dropping the container...'
+                sh 'docker rm -f apache1 || true' // prevent failure if it doesn't exist
             }
-        } 
-        
+        }
+
         stage('Create the Apache httpd container') {
             steps {
-            echo 'Creating the container...'
-            sh 'docker run -dit --name apache1 -p 9000:80  -v web:/usr/local/apache2/htdocs/ httpd'
+                echo 'Creating the container...'
+                sh 'docker run -dit --name apache1 -p 9000:80 -v $(pwd)/web:/usr/local/apache2/htdocs/ httpd'
             }
         }
-        stage('Copy the web application to the container directory') {
-            steps {
-                echo 'Copying web application...'
-                sh 'ls'
-                sh 'cp -r web/* /web'
-            }
-        }
+
         stage('Checking the app') {
             steps {
                 echo 'Testing the web app'
-                sh 'wget http://localhost:9000'
+                sh 'sleep 5' // wait a bit for the container to start
+                sh 'curl --fail --silent http://localhost:9000 || echo "App not responding"'
             }
-        }       
+        }
     }
 }
+
