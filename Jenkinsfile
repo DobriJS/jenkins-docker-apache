@@ -17,7 +17,7 @@ pipeline {
                 // sh 'rm -rf /home/jenkins/web'
                 
                 //Create the directory
-                sh 'sudo mkdir /home/cloud_user/web'  
+                sh 'mkdir web'  
             }
         }
         /* stage('Drop the Apache HTTPD Docker container'){
@@ -30,13 +30,13 @@ pipeline {
         stage('Create the Apache httpd container') {
             steps {
             echo 'Creating the container...'
-            sh 'docker run -dit --name apache1 -p 9000:80  -v /home/cloud_user/web:/usr/local/apache2/htdocs/ httpd'
+            sh 'docker run -dit --name apache1 -p 9000:80  -v web:/usr/local/apache2/htdocs/ httpd'
             }
         }
         stage('Copy the web application to the container directory') {
             steps {
                 echo 'Copying web application...'             
-                sh 'cp -r web/* /home/cloud_user/web'
+                sh 'cp -r web/* web'
             }
         }
         stage('Checking the app') {
