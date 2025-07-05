@@ -35,7 +35,8 @@ pipeline {
         }
         stage('Copy the web application to the container directory') {
             steps {
-                echo 'Copying web application...'             
+                echo 'Copying web application...'
+                sh 'ls'
                 sh 'cp -r web/* /web'
             }
         }
